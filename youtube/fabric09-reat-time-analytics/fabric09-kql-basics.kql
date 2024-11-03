@@ -1,0 +1,63 @@
+//***************************************************************
+//	Fabric
+//	Real-Time Analytics - dane strumieniowe w Fabric
+//
+//	www.youtube.com/kursysql
+//	www.kursyfabric.pl
+//
+//	Tomasz Lbera | MVP Data Platform | 	libera@kursysql.pl
+//***************************************************************
+
+
+// wyświetla zawartość tabeli
+BikepointsStatus
+
+// take (alias limit) 
+BikepointsStatus
+| take 10
+
+// top ograniczenie wyniku z określeniem porządku sortowania
+BikepointsStatus
+| top 10 by BikepointID
+
+BikepointsStatus
+| top 10 by BikepointID desc 
+
+// project - które kolumny wyświetlić
+BikepointsStatus
+| take 10
+| project BikepointID, Street, Neighbourhood, No_Bikes, No_Empty_Docks
+
+// agregacje
+BikepointsStatus
+| summarize count() 
+
+BikepointsStatus
+| count
+
+// grupowanie
+BikepointsStatus
+| summarize count() by Neighbourhood
+
+
+// sortowanie - domyślanie malejąco
+BikepointsStatus
+| summarize count() by Neighbourhood
+| sort by count_
+
+BikepointsStatus
+| summarize count() by Neighbourhood
+| sort by count_ desc
+
+BikepointsStatus
+| summarize count() by Neighbourhood
+| sort by count_ asc
+
+
+// wizualizacje
+// - "render" wyświetla jako wykres, musi być ostatnim operatorem w zapytaniu
+// grupowanie
+BikepointsStatus
+| summarize count() by Neighbourhood
+| sort by count_ desc
+| render columnchart 
