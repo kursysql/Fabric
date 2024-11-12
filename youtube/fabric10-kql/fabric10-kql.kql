@@ -1,0 +1,100 @@
+//***************************************************************
+//	Fabric
+//	KQL - Kusto Query Language
+//
+//	www.youtube.com/kursysql
+//	www.kursyfabric.pl
+//
+//	Tomasz Lbera | MVP Data Platform | 	libera@kursysql.pl
+//***************************************************************
+
+
+// wyświetla zawartość tabeli
+BikepointsStatus
+
+// T-SQL też zadziała!
+SELECT TOP 100 * FROM BikepointsStatus
+
+// take (alias limit) 
+BikepointsStatus
+| take 10
+
+// top ograniczenie wyniku z określeniem porządku sortowania
+BikepointsStatus
+| top 10 by BikepointID
+
+BikepointsStatus
+| top 10 by BikepointID desc 
+
+// project - które kolumny wyświetlić
+BikepointsStatus
+| take 10
+| project BikepointID, Street, Neighbourhood, No_Bikes, No_Empty_Docks
+
+// project - aliasy
+BikepointsStatus
+| take 10
+| project BikepointID, SzerokoscGeograficzna=Latitude, DlogoscGeograficzna=Longitude
+
+// extend - kolumny obliczane
+BikepointsStatus
+| take 5
+| extend No_Docs = No_Bikes+No_Empty_Docks
+| project BikepointID, No_Bikes, No_Empty_Docks, No_Docs
+
+// distinct usuwanie duplikatów
+BikepointsStatus
+| distinct Neighbourhood
+
+// filtrowanie
+BikepointsStatus
+| where Neighbourhood == "London Bridge"
+
+// ! uwaga na wielkość liter
+BikepointsStatus
+| where Neighbourhood == "london bridge"
+
+// wyłączenie wrażliwości na wielkość znaków
+BikepointsStatus
+| where Neighbourhood =~ "London Bridge"
+
+// kolejność ma znaczenie
+// najpierw filtrowanie, a potem ograniczenie wierszy - 5 wierszy w wyniku
+BikepointsStatus
+| where Neighbourhood == "London Bridge"
+| take 5
+
+// najpierw  ograniczenie wierszy, a potem filtrowanie, 2 wiersze w wyniku
+BikepointsStatus
+| take 5
+| where Neighbourhood == "London Bridge"
+
+// zliczanie
+BikepointsStatus
+| summarize count() 
+
+BikepointsStatus
+| count
+
+// agregacje
+BikepointsStatus
+| summarize No_Bikepoints=count() by Neighbourhood
+
+
+// grupowanie
+BikepointsStatus
+| summarize No_Bikepoints=count() by Neighbourhood
+| sort by No_Bikepoints desc
+
+BikepointsStatus
+| summarize No_Bikepoints=count() by Neighbourhood
+| sort by Neighbourhood asc
+
+
+// wizualizacje
+// - "render" wyświetla jako wykres, musi być ostatnim operatorem w zapytaniu
+// grupowanie
+BikepointsStatus
+| summarize No_Bikepoints=count() by Neighbourhood
+| sort by No_Bikepoints desc
+| render columnchart 
