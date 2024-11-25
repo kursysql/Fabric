@@ -9,92 +9,266 @@
 //***************************************************************
 
 
-// wyświetla zawartość tabeli
-BikepointsStatus
+//
+// Pierwsze zapytania, take
+//
 
-// T-SQL też zadziała!
-SELECT TOP 100 * FROM BikepointsStatus
+
+// to jest komentarz
+
+
+// wyświetla zawartość tabeli
+Weather
+
+
+SELECT TOP 100 * FROM Weather
 
 // take (alias limit) 
-BikepointsStatus
+Weather
 | take 10
 
 // top ograniczenie wyniku z określeniem porządku sortowania
-BikepointsStatus
-| top 10 by BikepointID
+Weather
+| top 10 by State
 
-BikepointsStatus
-| top 10 by BikepointID desc 
+Weather
+| top 10 by State desc
 
-// project - które kolumny wyświetlić
-BikepointsStatus
-| take 10
-| project BikepointID, Street, Neighbourhood, No_Bikes, No_Empty_Docks
+Weather
+| top 10 by State asc
 
-// project - aliasy
-BikepointsStatus
-| take 10
-| project BikepointID, SzerokoscGeograficzna=Latitude, DlogoscGeograficzna=Longitude
+// distinct
+Weather
+| distinct State
+| order by State asc
 
-// extend - kolumny obliczane
-BikepointsStatus
+Weather
+| distinct EventType
+| sort by EventType asc
+
+
+//
+// project, extend
+//
+
+
+// extend - dodaje kolumnę obliczaną
+// project - określa które kolumny uwzględnić w wyniku
+Weather
 | take 5
-| extend No_Docs = No_Bikes+No_Empty_Docks
-| project BikepointID, No_Bikes, No_Empty_Docks, No_Docs
+| extend Duration = EndTime - StartTime                      
+| project StartTime, EndTime, Duration, EventType, State;   
 
-// distinct usuwanie duplikatów
-BikepointsStatus
-| distinct Neighbourhood
+// aliasy
+Weather
+| take 5
+| extend Duration = EndTime - StartTime
+| project CzasStart=StartTime, CzasKoniec=EndTime, CzasTrwania=Duration, TypZdarzenia=EventType, Stan=State;   
+
+
+//
+// where
+//
+
 
 // filtrowanie
-BikepointsStatus
-| where Neighbourhood == "London Bridge"
+Weather
+| where State == "NEW YORK"
 
 // ! uwaga na wielkość liter
-BikepointsStatus
-| where Neighbourhood == "london bridge"
+Weather
+| where State == "New York"
 
 // wyłączenie wrażliwości na wielkość znaków
-BikepointsStatus
-| where Neighbourhood =~ "London Bridge"
+Weather
+| where State =~ "New York"
+
 
 // kolejność ma znaczenie
 // najpierw filtrowanie, a potem ograniczenie wierszy - 5 wierszy w wyniku
-BikepointsStatus
-| where Neighbourhood == "London Bridge"
+Weather
+| where State == "NEW YORK"
 | take 5
 
 // najpierw  ograniczenie wierszy, a potem filtrowanie, 2 wiersze w wyniku
-BikepointsStatus
+Weather
 | take 5
-| where Neighbourhood == "London Bridge"
+| where State == "NEW YORK"
 
-// zliczanie
-BikepointsStatus
-| summarize count() 
 
-BikepointsStatus
-| count
+//
+// summarize
+//
+
 
 // agregacje
-BikepointsStatus
-| summarize No_Bikepoints=count() by Neighbourhood
+Weather
+| summarize count()
+
+Weather
+| count
+
+Weather
+| summarize LiczbaZdarzen=count()
+
+Weather
+| summarize LiczbaZdarzen=count() by State
 
 
-// grupowanie
-BikepointsStatus
-| summarize No_Bikepoints=count() by Neighbourhood
-| sort by No_Bikepoints desc
+Weather
+| summarize LiczbaZdarzen=count() by State, EventType
+| sort by State asc, EventType desc
 
-BikepointsStatus
-| summarize No_Bikepoints=count() by Neighbourhood
-| sort by Neighbourhood asc
+// distinct count
+Weather
+| summarize LiczbaZdarzen=count(), TypyBurz=dcount(EventType) by State
+| sort by State asc
+
+Weather
+| summarize LiczbaZdarzen=count(), TypyBurz=dcount(EventType) by State
+| where LiczbaZdarzen>2000
+| sort by State asc
+
+
+//
+// bin
+//
+
+
+// bin - przydatny jeśli agregujemy dane z długiego okresu czasu (koszykowanie)
+Weather
+| summarize count() by StartTime
+
+Weather
+| summarize count() by bin(StartTime, 1h)
+| sort by StartTime asc
+
+
+Weather
+| summarize count() by bin(StartTime, 1d)
+| sort by StartTime asc
+
+Weather
+| summarize count() by bin(StartTime, 180d)
+| sort by StartTime asc
+
+
+
+
+//
+// partition by
+//
+
+Weather
+| distinct EventType
+
+
+
+
+// partition by
+Weather
+| project StartTime, State, EventType, DamageProperty
+| where EventType == "Tornado"
+| partition by EventType 
+(
+    order by StartTime asc
+    | extend prev_demage = prev(DamageProperty, 1)
+)
+
+// hint.strategy - native dla zbiorów - kilka tysięcy unikalnych wartości, shuffle - miliony
+Weather
+| project StartTime, State, EventType, DamageProperty
+| where EventType == "Tornado"
+| partition hint.strategy = native by EventType 
+(
+    order by StartTime asc
+    | extend prev_demage = prev(DamageProperty, 1)
+)
+
+
+
+
+//
+// ago, between
+//
+
+
+
+// filtrowanie czasu
+Weather
+| sort by StartTime
+
+Weather
+| summarize min(StartTime), max(StartTime)
+
+
+Weather
+| where StartTime < ago(4h)
+
+Weather
+| where StartTime > ago(4h)
+
+Weather
+| where StartTime > ago(6175d)
+
+// https://learn.microsoft.com/en-us/kusto/query/scalar-data-types/timespan?view=microsoft-fabric#timespan-literals
+
+// between
+Weather
+| where StartTime  between (datetime(2007-01-01T15:00:00) .. datetime(2007-01-05))
+| sort by StartTime asc
+
+// now
+Weather
+| where StartTime  between (datetime(2007-12-01T15:00:00) .. now())
+| sort by StartTime asc
+
+// now
+Weather
+| where StartTime  between (datetime(2007-12-01T15:00:00) .. now()-1d)
+| sort by StartTime asc
+
+
+
+
+//
+// render
+//
+
 
 
 // wizualizacje
 // - "render" wyświetla jako wykres, musi być ostatnim operatorem w zapytaniu
-// grupowanie
-BikepointsStatus
-| summarize No_Bikepoints=count() by Neighbourhood
-| sort by No_Bikepoints desc
+Weather
+| where EventType =="Tornado"
+| summarize LiczbaZdarzen = count() by State 
+| where LiczbaZdarzen > 100
+
+
+Weather
+| where EventType =="Tornado"
+| summarize LiczbaZdarzen = count() by State 
+| where LiczbaZdarzen > 100
+| render piechart
+
+Weather
+| where EventType =="Tornado"
+| summarize LiczbaZdarzen = count() by State 
+| where LiczbaZdarzen > 100
 | render columnchart 
+
+Weather
+| where EventType =="Tornado"
+| summarize LiczbaZdarzen = count() by State 
+| where LiczbaZdarzen > 100
+| sort by LiczbaZdarzen asc 
+| render columnchart 
+
+
+Weather
+| summarize count() by bin(StartTime, 30d)
+| sort by StartTime asc
+| render  timechart 
+
+
+
