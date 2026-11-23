@@ -6,25 +6,23 @@
 ## 0. Środowisko
 
 ### Przygotowane zasoby
-| Zasób | Nazwa |
-|---|---|
-| Azure SQL Database | `AdventureWorks_Mirror` |
-| Azure Resource Group | `rg-demo-zeroetl` |
-| Azure Key Vault | `kv-demo-zeroetl` |
-| Fabric - referencja Key Vault | `akv-zeroetl` |
-| Fabric - Lakehouse | `lh_zeroetl_dest` |
+| Zasób                         | Nazwa                   |
+| ----------------------------- | ----------------------- |
+| Azure SQL Database            | `AdventureWorks_Mirror` |
+| Azure Resource Group          | `rg-demo-zeroetl`       |
+| Azure Key Vault               | `kv-demo-zeroetl`       |
+| Fabric - referencja Key Vault | `akv-zeroetl`           |
+| Fabric - Lakehouse            | `lh_zeroetl_dest`       |
 
 ### W ramach demo
 
-| Zasób | Nazwa |
-|---|---|
-| App Registration / Service Principal | `sp-zeroetl-mirroring` |
-| Secret w Key Vault | `sp-zeroetl-mirroring-secret` |
-| Połączenie Fabric | `conn_zeroetl_azuresql` |
-| Mirrored Database | `mir_zeroetl` |
-| Notebook do sprawdzania replikacji | `nb_zeroetl_mirroring` |
-
-
+| Zasób                                | Nazwa                         |
+| ------------------------------------ | ----------------------------- |
+| App Registration / Service Principal | `sp-zeroetl-mirroring`        |
+| Secret w Key Vault                   | `sp-zeroetl-mirroring-secret` |
+| Połączenie Fabric                    | `conn_zeroetl_azuresql`       |
+| Mirrored Database                    | `mir_zeroetl`                 |
+| Notebook do sprawdzania replikacji   | `nb_zeroetl_mirroring`        |
 
 ## 1. Managed Identity serwera Azure SQL
 
@@ -33,7 +31,7 @@
   - Identity
   - System assigned: **Status: On**
 
-![System Assigned Identity](img/fabric26-system-assigned-identity.png)
+![System Assigned Identity](./img/fabric26-system-assigned-identity.png)
 
 ```sql
 -- Azure SQL Database
@@ -47,15 +45,15 @@ Rejestracja Entra ID - **App registration** `sp-zeroetl-mirroring`
 Zapisz:
 - **Application (client) ID** - Service principal ID 
 - **Directory (tenant) ID** - Tenant ID     
-![sp-zeroetl-mirroring](img/fabric26-sp_zeroetl-mirroring.png)
+![sp-zeroetl-mirroring](./img/fabric26-sp_zeroetl-mirroring.png)
 ### 2.2. Client Secret
 Utworzenie poświadczeń (Client Secret) 
-![sp-zeroetl-mirroring secret](img/fabric26-sp_zeroetl-mirroring-secret.png)
+![sp-zeroetl-mirroring secret](./img/fabric26-sp_zeroetl-mirroring-secret.png)
 
 ### 2.3. Zapisanie w Key Vault
 Zapisanie Client Secret w **Key Vault** `kv-demo-zeroetl` jako `sp-zeroetl-mirroring-secret`.
 
-![sp-zeroetl-mirroring-secret](img/fabric26-sp_zeroetl-mirroring-sp-zeroetl-mirroring-secret.png)
+![sp-zeroetl-mirroring-secret](./img/fabric26-sp_zeroetl-mirroring-sp-zeroetl-mirroring-secret.png)
 
 
 ### 2.4. Baza SQL - uprawnienia dla Service Principal
@@ -129,16 +127,16 @@ Utwórz **Mirrored Azure SQL Database**: `mir_zeroetl`.
 ### 3.3. Weryfikacja: SQL analytics endpoint
 Sprawdź dostępność tabel w SQL analytics endpoint 
 
-![sql endpoint](img/fabric26-zero-etl-sql-endpoint.png)
+![sql endpoint](./img/fabric26-zero-etl-sql-endpoint.png)
 
 
 ### 3.4. Weryfikacja: Spark SQL 
 
 - utwórz notebook  `nb_zeroetl_mirroring` 
 - użyj Spark SQL do weryfikacji zmian w tabelach
-- użyj pełnej nazwy: `Zero-ETL`.mir_zeroetl.SalesLT.Product
+- użyj pełnej nazwy: mir_zeroetl.SalesLT.Product
 
-![sparksql](img/fabric26-spark-sql.png)
+![sparksql](./img/fabric26-spark-sql.png)
 
 ## 4. Wymagania i ograniczenia
 
@@ -217,7 +215,7 @@ https://learn.microsoft.com/en-us/fabric/mirroring/extended-capabilities-delta-c
 ### 6.1 Włącz Delta Change Data Feed
 Włącz Delta Change Data Feed w ustawieniach mirrora
 
-![fabric26-delta-change-data-feed](img/fabric26-delta-change-data-feed.png)
+![fabric26-delta-change-data-feed](./img/fabric26-delta-change-data-feed.png)
 
 
 
@@ -356,4 +354,4 @@ DROP LOGIN IF EXISTS fabric_mirroring_login;
 
 - Usuń App Registration `sp-zeroetl-mirroring`.
 - Usuń sekret `sp-zeroetl-mirroring-secret` z Key Vault.
-- Zachowaj `AdventureWorks_Mirror` i pozostałe zasoby potrzebne do następnych demonstracji.
+- Zachowaj `AdventureWorks_Mirror` i pozostałe zasoby 

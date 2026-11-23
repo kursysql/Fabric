@@ -101,6 +101,7 @@ SELECT * FROM sys.database_permissions WHERE grantee_principal_id = USER_ID('fab
 	4. Wymagania i ograniczenia
 */
 
+-- is_user_defined = 1
 SELECT
     s.name AS SchemaName,
     t.name AS TableName,
@@ -119,10 +120,18 @@ WHERE ut.is_user_defined = 1
 ORDER BY s.name, t.name, c.column_id;
 
 
+SELECT *FROM SalesLT.Product
+
 
 /*
 	5. Test replikacji
 */
+
+
+
+-- Status i informacje o replikowanych tabelach
+EXEC sys.sp_help_change_feed_table @source_schema='SalesLT', @source_name='Product';
+
 
 
 -- Pierwsza zmiana ceny
@@ -202,10 +211,11 @@ WHERE ProductID = 680
    OR ProductNumber = 'ZEROETL-001';
 
 
-DROP USER IF EXISTS [sp-zeroetl-mirroring];
-DROP USER IF EXISTS fabric_mirroring_user;
+DROP USER [sp-zeroetl-mirroring];
+DROP USER fabric_mirroring_user;
 GO
 
-DROP LOGIN IF EXISTS [sp-zeroetl-mirroring];
-DROP LOGIN IF EXISTS fabric_mirroring_login;
+-- master
+DROP LOGIN [sp-zeroetl-mirroring];
+DROP LOGIN fabric_mirroring_login;
 GO
