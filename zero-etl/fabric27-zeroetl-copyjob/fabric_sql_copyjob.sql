@@ -326,3 +326,9 @@ SELECT @LastID = MAX(ProductID) FROM SalesLT.Product;
 DBCC CHECKIDENT ('SalesLT.Product', RESEED, @LastID);
 
 
+
+
+DROP USER [sp-zeroetl-copyjob];
+
+-- master
+DROP LOGIN [sp-zeroetl-copyjob];
